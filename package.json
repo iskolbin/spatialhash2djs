@@ -1,11 +1,12 @@
 {
 	"name": "spatialhash2d",
+	"main": "./dist/index.js",
 	"repository": "github.com/iskolbin/spatialhash2djs",
 	"description": "Spatial hash 2D implementation for JS",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"license": "MIT",
 	"scripts": {
-		"build": "babel src --out-dir dist",
+		"build": "rm dist/*; babel src --out-dir dist",
 		"prepublish": "npm run build"
 	},
 	"devDependencies": {

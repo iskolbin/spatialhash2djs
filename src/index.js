@@ -1,3 +1,3 @@
-import SpatialHash from './SpatialHash'
+import SpatialHash2D from './SpatialHash2D'
 
-export default SpatialHash
+export default SpatialHash2D
