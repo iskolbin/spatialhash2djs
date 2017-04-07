@@ -23,8 +23,7 @@ export default class SpatialHash2D {
 		const cs = this.cellSize
 		const x0 = Math.floor( x / cs )
 		const y0 = Math.floor( y / cs )
-		hash = (i << X_BIT) | j
-		return hash2rects.get( x0, y0 )
+		return hash2rects.get( (i << X_BIT) | j)
 	}
 
 	evalHashes( rect ) {
@@ -45,16 +44,18 @@ export default class SpatialHash2D {
 
 	add( rect ) {
 		if ( this.has( rect )) {
-			this.remove( rect )
+			this.delete( rect )
 		}
 		const hashes = this.evalHashes( rect )
 		this.rect2hashes.set( rect, hashes )
-		for ( hash of hashes ) {
+		//for ( let hash of hashes ) {
+		hashes.forEach( hash => {
 			if ( !this.hash2rects.has( hash )) {
 				this.hash2rects.set( hash, new Set( [rect] ))
 			} else {
 				const rects = this.hash2rects.get( hash )
-				for ( let r of rects ) {
+				//for ( let r of rects ) {
+				rects.forEach( r => {
 					if ( this.areRectsOverlap( rect, r )) {
 						if ( this.overlaps.has( rect )) {
 							this.overlaps.get( rect ).add( r )
@@ -67,30 +68,32 @@ export default class SpatialHash2D {
 							this.overlaps.set( r, new Set([rect]))
 						}
 					}
-				}
+				})
 				rects.add( rect )
 			}
-		}
+		})
 		return this
 	}
 
 	delete( rect ) {
 		if ( this.has( rect )) {
-			for ( hash of this.rect2hashes.get( rect ) ) {
+			//for ( let hash of this.rect2hashes.get( rect ) ) {
+			this.rect2hashes.get( rect ).forEach( hash => {
 				const rectsSet = this.hash2rects.get( hash ).delete( rect )
 				if ( rectsSet.size <= 0 ) {
 					this.hash2rects.delete( hash )
 				}
-			}
+			})
 			if ( this.overlaps.has( rect )) {
-				for ( let r of this.overlaps.get( rect )) {
+				//for ( let r of this.overlaps.get( rect )) {
+				this.overlaps.get( rect ).forEach( r => {
 					const rs = this.overlaps.get( r )
-					if ( rs.size > 1 ) {
+					if ( rs && rs.size > 1 ) {
 						rs.delete( rect )
 					} else {
 						this.overlaps.delete( r )
 					}
-				}
+				})
 			}
 		}
 		return this

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			Testing spatialhash2d
+		</title>
+		<script src="./lib/SPATIALHASH2D.js"></script>
+	</head>
+	<body>
+		<canvas id="spatialhash2d-canvas" width="800" height="600"></canvas>
+<script>
+'use strict';
+
+var canvas = document.getElementById( "spatialhash2d-canvas" );
+var ctx = canvas.getContext( '2d' );
+var currentTime = 0;
+var spatialhash = new SpatialHash2D.default(128);
+var rects = [];
+var N = 100;
+var W = 32;
+var MAX_X = canvas.width;
+var MAX_Y = canvas.height;
+
+function randomInt( limit ) {
+	return (Math.random() * limit) | 0;
+}
+
+for ( var i = 0; i < N; i++ ) {
+	rects[i] = [randomInt(MAX_X-W), randomInt(MAX_Y-W), W, W,-30+randomInt(60),-30+randomInt(60)];
+	spatialhash.add( rects[i] );
+}
+
+function render( t ) {
+	if ( currentTime !== 0 ) {
+		var	dt = (t - currentTime) / 1000.0;
+		ctx.fillStyle = 'black';
+		ctx.fillRect( 0, 0, MAX_X, MAX_Y );
+		ctx.fillStyle = 'red';
+		for ( var i = 0; i < rects.length; i++ ) {
+			var rect = rects[i];
+			var x = rect[0];
+			var y = rect[1];
+			var w = rect[2];
+			var h = rect[3];
+			var vx = rect[4];
+			var vy = rect[5];
+			var dx = vx * dt;
+			var dy = vy * dt;
+			ctx.fillRect( x|0, y|0, w, h );
+
+			if ( x + dx <= 0 || x + w + dx >= MAX_X ) {
+				rect[4] = -vx;
+				dx = -dx;
+			}
+			if ( y + dy <= 0 || y + h + dy >= MAX_Y ) {
+				rect[5] = -vy;
+				dy = -dy;
+			}
+			rect[0] += dx;
+			rect[1] += dy;
+			spatialhash.add( rect );
+		}
+	}
+
+
+	currentTime = t;
+	window.requestAnimationFrame( render );
+}
+
+window.requestAnimationFrame( render );
+</script>
+	</body>
+</html>
